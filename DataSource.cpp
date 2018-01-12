@@ -6,7 +6,7 @@
 #include <msdasc.h>
 
 #define COM_NO_WINDOWS_H
-#define OLEDBVER 0X0260 //¶¨ÒåOLEDB¿â°æ±¾
+#define OLEDBVER 0X0260 //å®šä¹‰OLEDBåº“ç‰ˆæœ¬
 #define DECLARE_BUFFER() TCHAR szBuf[1024] = _T("")
 #define COM_PRINTF(...)\
 	StringCchPrintf(szBuf, 1024, __VA_ARGS__);\
@@ -27,7 +27,7 @@
 
 #define DECLARE_OLEDB_INTERFACE(type) type* p##type = NULL
 
-void ConnectSQLServerByDialog() //Í¨¹ýµ¯³ö¶Ô»°¿òÀ´Á´½ÓSQL SERVERÊý¾Ý¿â
+void ConnectSQLServerByDialog() //é€šè¿‡å¼¹å‡ºå¯¹è¯æ¡†æ¥é“¾æŽ¥SQL SERVERæ•°æ®åº“
 {
 	DECLARE_BUFFER();
 	DECLARE_OLEDB_INTERFACE(IDBPromptInitialize);
@@ -35,13 +35,13 @@ void ConnectSQLServerByDialog() //Í¨¹ýµ¯³ö¶Ô»°¿òÀ´Á´½ÓSQL SERVERÊý¾Ý¿â
 
 	HWND hDesktop = GetDesktopWindow();
 	HRESULT hRes = CoCreateInstance(CLSID_DataLinks, NULL, CLSCTX_INPROC_SERVER, IID_IDBPromptInitialize, (void**)&pIDBPromptInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨IDBPromptInitialize½Ó¿ÚÊ§°Ü: %08x"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºIDBPromptInitializeæŽ¥å£å¤±è´¥: %08x"), hRes);
 	hRes = pIDBPromptInitialize->PromptDataSource(NULL, hDesktop, DBPROMPTOPTIONS_PROPERTYSHEET, 0, NULL, NULL, IID_IDBInitialize, (IUnknown**)&pIDBInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("µ¯³öÊý¾ÝÔ´¶Ô»°¿òÊ§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("å¼¹å‡ºæ•°æ®æºå¯¹è¯æ¡†å¤±è´¥:%08x\n"), hRes);
 
 	hRes = pIDBInitialize->Initialize();
-	COM_CHECK_SUCCESS(hRes, _T("Á´½ÓÊý¾Ý¿âÊ§°Ü:%08x\n"), hRes);
-	COM_PRINTF(_T("Á´½ÓÊý¾Ý¿â³É¹¦\n"));
+	COM_CHECK_SUCCESS(hRes, _T("é“¾æŽ¥æ•°æ®åº“å¤±è´¥:%08x\n"), hRes);
+	COM_PRINTF(_T("é“¾æŽ¥æ•°æ®åº“æˆåŠŸ\n"));
 
 	hRes = pIDBInitialize->Uninitialize();
 __CLEAN_UP:
@@ -50,7 +50,7 @@ __CLEAN_UP:
 	
 }
 
-void ConnectSQLServerByPropset() //Í¨¹ýÊôÐÔÁ´½ÓSQL SERVERÊý¾Ý¿â
+void ConnectSQLServerByPropset() //é€šè¿‡å±žæ€§é“¾æŽ¥SQL SERVERæ•°æ®åº“
 {
 	DECLARE_BUFFER();
 	DECLARE_OLEDB_INTERFACE(IDataInitialize);
@@ -58,35 +58,35 @@ void ConnectSQLServerByPropset() //Í¨¹ýÊôÐÔÁ´½ÓSQL SERVERÊý¾Ý¿â
 	DECLARE_OLEDB_INTERFACE(IDBInitialize);
 	CLSID clsid = {0};
 	HRESULT hRes = CoCreateInstance(CLSID_MSDAINITIALIZE, NULL, CLSCTX_INPROC_SERVER, IID_IDataInitialize, (void**)&pIDataInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨½Ó¿ÚIDBInitializeÊ§°Ü£º%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºæŽ¥å£IDBInitializeå¤±è´¥ï¼š%08x\n"), hRes);
 	hRes = CLSIDFromProgID(_T("SQLOLEDB"), &clsid);
-	COM_CHECK_SUCCESS(hRes, _T("²éÑ¯SQLOLEDB CLSID Ê§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("æŸ¥è¯¢SQLOLEDB CLSID å¤±è´¥:%08x\n"), hRes);
 	hRes = pIDataInitialize->CreateDBInstance(clsid, NULL,
 		CLSCTX_INPROC_SERVER, NULL, IID_IDBInitialize,
 		(IUnknown**)&pIDBInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨IDBInitialize½Ó¿ÚÊ§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºIDBInitializeæŽ¥å£å¤±è´¥:%08x\n"), hRes);
 
-	//¶¨ÒåÊôÐÔ
+	//å®šä¹‰å±žæ€§
 	DBPROP dbProp[5] = {0};
 	DBPROPSET dbPropsets[1] = {0};
 
-	//ÉèÖÃÊý¾Ý¿âÊµÀý
+	//è®¾ç½®æ•°æ®åº“å®žä¾‹
 	dbProp[0].dwPropertyID = DBPROP_INIT_DATASOURCE;
 	dbProp[0].dwOptions = DBPROPOPTIONS_REQUIRED;
 	dbProp[0].vValue.vt = VT_BSTR;
 	dbProp[0].vValue.bstrVal = SysAllocString(OLESTR("LIU-PC\\SQLEXPRESS"));
 	dbProp[0].colid = DB_NULLID;
-	//ÉèÖÃÊý¾Ý¿âÃû³Æ
+	//è®¾ç½®æ•°æ®åº“åç§°
 	dbProp[1].dwPropertyID = DBPROP_INIT_CATALOG;
 	dbProp[1].dwOptions = DBPROPOPTIONS_REQUIRED;
 	dbProp[1].vValue.vt = VT_BSTR;
 	dbProp[1].vValue.bstrVal = SysAllocString(OLESTR("Study"));
 	dbProp[1].colid = DB_NULLID;
-	//ÉèÖÃÊý¾Ý¿âÓÃ»§Ãû
+	//è®¾ç½®æ•°æ®åº“ç”¨æˆ·å
 	dbProp[2].dwPropertyID = DBPROP_AUTH_USERID;
 	dbProp[2].vValue.vt = VT_BSTR;
 	dbProp[2].vValue.bstrVal = SysAllocString(OLESTR("sa"));
-	//ÉèÖÃÊý¾Ý¿âÃÜÂë
+	//è®¾ç½®æ•°æ®åº“å¯†ç 
 	dbProp[3].dwPropertyID = DBPROP_AUTH_PASSWORD;
 	dbProp[3].vValue.vt = VT_BSTR;
 	dbProp[3].vValue.bstrVal = SysAllocString(OLESTR("123456"));
@@ -94,15 +94,15 @@ void ConnectSQLServerByPropset() //Í¨¹ýÊôÐÔÁ´½ÓSQL SERVERÊý¾Ý¿â
 	dbPropsets[0].cProperties = 4;
 	dbPropsets[0].guidPropertySet = DBPROPSET_DBINIT;
 	dbPropsets[0].rgProperties = dbProp;
-	//ÉèÖÃÊôÐÔ
+	//è®¾ç½®å±žæ€§
 	hRes = pIDBInitialize->QueryInterface(IID_IDBProperties, (void**)&pIDBProperties);
-	COM_CHECK_SUCCESS(hRes, _T("²éÑ¯IDBProperties½Ó¿ÚÊ§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("æŸ¥è¯¢IDBPropertiesæŽ¥å£å¤±è´¥:%08x\n"), hRes);
 	hRes = pIDBProperties->SetProperties(1, dbPropsets);
-	COM_CHECK_SUCCESS(hRes, _T("ÉèÖÃÊôÐÔÊ§°Ü:%08x\n"), hRes);
-	//Á´½ÓÊý¾Ý¿â
+	COM_CHECK_SUCCESS(hRes, _T("è®¾ç½®å±žæ€§å¤±è´¥:%08x\n"), hRes);
+	//é“¾æŽ¥æ•°æ®åº“
 	hRes = pIDBInitialize->Initialize();
-	COM_CHECK_SUCCESS(hRes, _T("Á´½ÓÊý¾Ý¿âÊ§°Ü:%08x\n"), hRes);
-	COM_PRINTF(_T("Á´½ÓÊý¾Ý¿â³É¹¦\n"));
+	COM_CHECK_SUCCESS(hRes, _T("é“¾æŽ¥æ•°æ®åº“å¤±è´¥:%08x\n"), hRes);
+	COM_PRINTF(_T("é“¾æŽ¥æ•°æ®åº“æˆåŠŸ\n"));
 	pIDBInitialize->Uninitialize();
 
 __CLEAN_UP:
@@ -111,22 +111,22 @@ __CLEAN_UP:
 	SAFE_RELEASE(pIDBProperties);
 }
 
-void ConnectSQLServerByConnstr() //Í¨¹ýÁ¬½Ó×Ö·û´®Á¬½ÓÊý¾Ý¿â
+void ConnectSQLServerByConnstr() //é€šè¿‡è¿žæŽ¥å­—ç¬¦ä¸²è¿žæŽ¥æ•°æ®åº“
 {
 	DECLARE_OLEDB_INTERFACE(IDataInitialize);
 	DECLARE_OLEDB_INTERFACE(IDBInitialize);
 	DECLARE_BUFFER();
 	HRESULT hRes = CoCreateInstance(CLSID_MSDAINITIALIZE, NULL, CLSCTX_INPROC_SERVER, IID_IDataInitialize, (void**)&pIDataInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨IDataInitialize½Ó¿ÚÊ§°Ü:%08x!\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºIDataInitializeæŽ¥å£å¤±è´¥:%08x!\n"), hRes);
 
 	//Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=study;Data Source=LIU-PC\SQLEXPRESS
 	hRes = pIDataInitialize->GetDataSource(NULL, CLSCTX_INPROC_SERVER, 
 		OLESTR("Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC\\SQLEXPRESS;"), 
 		IID_IDBInitialize, (IUnknown**)&pIDBInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("»ñÈ¡IDBInitialize½Ó¿ÚÊ§°Ü:%08x!\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("èŽ·å–IDBInitializeæŽ¥å£å¤±è´¥:%08x!\n"), hRes);
 	hRes = pIDBInitialize->Initialize();
-	COM_CHECK_SUCCESS(hRes, _T("Á¬½ÓÊý¾Ý¿âÊ§°Ü:%08x!\n"), hRes);
-	COM_PRINTF(_T("Á¬½ÓÊý¾Ý¿â³É¹¦\n"));
+	COM_CHECK_SUCCESS(hRes, _T("è¿žæŽ¥æ•°æ®åº“å¤±è´¥:%08x!\n"), hRes);
+	COM_PRINTF(_T("è¿žæŽ¥æ•°æ®åº“æˆåŠŸ\n"));
 	pIDBInitialize->Uninitialize();
 __CLEAN_UP:
 	SAFE_RELEASE(pIDataInitialize);
@@ -143,18 +143,18 @@ void GetConnectString()
 	LPOLESTR pConnStr = NULL;
 	HWND hDeskTop = GetDesktopWindow();
 	HRESULT hRes = CoCreateInstance(CLSID_DataLinks, NULL, CLSCTX_INPROC_SERVER, IID_IDBPromptInitialize, (void**)&pIDBPromptInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨IDBPromptInitialize½Ó¿ÚÊ§°Ü:%08x!\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºIDBPromptInitializeæŽ¥å£å¤±è´¥:%08x!\n"), hRes);
 	hRes = pIDBPromptInitialize->PromptDataSource(NULL, hDeskTop, DBPROMPTOPTIONS_PROPERTYSHEET, 0, NULL, NULL, IID_IDBInitialize, (IUnknown**)&pIDBInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("µ¯³öÊý¾ÝÔ´¶Ô»°¿òÊ§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("å¼¹å‡ºæ•°æ®æºå¯¹è¯æ¡†å¤±è´¥:%08x\n"), hRes);
 
 
 	hRes= pIDBPromptInitialize->QueryInterface(IID_IDataInitialize, (void**)&pIDataInitialize);
-	COM_CHECK_SUCCESS(hRes, _T("´´½¨IDataInitialize½Ó¿ÚÊ§°Ü:%08x!\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("åˆ›å»ºIDataInitializeæŽ¥å£å¤±è´¥:%08x!\n"), hRes);
 
 	hRes = pIDataInitialize->GetInitializationString(pIDBInitialize, TRUE, &pConnStr);
-	COM_CHECK_SUCCESS(hRes, _T("»ñÈ¡Á¬½Ó×Ö´®Ê§°ÜÊ§°Ü:%08x\n"), hRes);
+	COM_CHECK_SUCCESS(hRes, _T("èŽ·å–è¿žæŽ¥å­—ä¸²å¤±è´¥å¤±è´¥:%08x\n"), hRes);
 
-	COM_PRINTF(_T("Á¬½Ó×Ö·û´®:%s"), pConnStr);
+	COM_PRINTF(_T("è¿žæŽ¥å­—ç¬¦ä¸²:%s"), pConnStr);
 	SysAllocString(pConnStr);
 __CLEAN_UP:
 	SAFE_RELEASE(pIDataInitialize);
