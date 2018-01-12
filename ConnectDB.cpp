@@ -2,8 +2,8 @@
 #include <windows.h>
 #include <strsafe.h>
 
-#define COM_NO_WINDOWS_H    //Èç¹ûÒÑ¾­°üº¬ÁËWindows.h»ò²»Ê¹ÓÃÆäËûWindows¿âº¯ÊýÊ±
-#define OLEDBVER 0x0260     //MSDAC2.6°æ
+#define COM_NO_WINDOWS_H    //å¦‚æžœå·²ç»åŒ…å«äº†Windows.hæˆ–ä¸ä½¿ç”¨å…¶ä»–Windowsåº“å‡½æ•°æ—¶
+#define OLEDBVER 0x0260     //MSDAC2.6ç‰ˆ
 #include <oledb.h>
 #include <oledberr.h>
 
@@ -34,60 +34,60 @@
 int _tmain(int argc, TCHAR* argv[])
 {
 	CoInitialize(NULL);
-	//´´½¨OLEDB init½Ó¿Ú
+	//åˆ›å»ºOLEDB initæŽ¥å£
 	IDBInitialize *pDBInit = NULL;
 	IDBProperties *pIDBProperties = NULL;
-	//ÉèÖÃÁ´½ÓÊôÐÔ
+	//è®¾ç½®é“¾æŽ¥å±žæ€§
 	DBPROPSET dbPropset[1] = {0};
 	DBPROP dbProps[5] = {0};
-	CLSID clsid_MSDASQL = {0}; //sql server µÄÊý¾ÝÔ´¶ÔÏó
+	CLSID clsid_MSDASQL = {0}; //sql server çš„æ•°æ®æºå¯¹è±¡
 	
 	HRESULT hRes = CLSIDFromProgID(_T("SQLOLEDB"), &clsid_MSDASQL);
-	GRS_COM_CHECK(hRes, _T("»ñÈ¡SQLOLEDBµÄCLSIDÊ§°Ü£¬´íÎóÂë£º0x%08x\n"), hRes);
+	GRS_COM_CHECK(hRes, _T("èŽ·å–SQLOLEDBçš„CLSIDå¤±è´¥ï¼Œé”™è¯¯ç ï¼š0x%08x\n"), hRes);
 	hRes = CoCreateInstance(clsid_MSDASQL, NULL, CLSCTX_INPROC_SERVER, IID_IDBInitialize,(void**)&pDBInit);
-	GRS_COM_CHECK(hRes, _T("ÎÞ·¨´´½¨IDBInitialize½Ó¿Ú£¬´íÎóÂë£º0x%08x\n"), hRes);
+	GRS_COM_CHECK(hRes, _T("æ— æ³•åˆ›å»ºIDBInitializeæŽ¥å£ï¼Œé”™è¯¯ç ï¼š0x%08x\n"), hRes);
 
-	//Ö¸¶¨Êý¾Ý¿âÊµÀýÃû£¬ÕâÀïÊ¹ÓÃÁË±ðÃûlocal£¬Ö¸¶¨±¾µØÄ¬ÈÏÊµÀý
+	//æŒ‡å®šæ•°æ®åº“å®žä¾‹åï¼Œè¿™é‡Œä½¿ç”¨äº†åˆ«ålocalï¼ŒæŒ‡å®šæœ¬åœ°é»˜è®¤å®žä¾‹
 	dbProps[0].dwPropertyID = DBPROP_INIT_DATASOURCE;
 	dbProps[0].dwOptions = DBPROPOPTIONS_REQUIRED;
 	dbProps[0].vValue.vt = VT_BSTR;
 	dbProps[0].vValue.bstrVal = SysAllocString(OLESTR("LIU-PC\\SQLEXPRESS"));
 	dbProps[0].colid = DB_NULLID;
 
-	//Ö¸¶¨Êý¾Ý¿â¿âÃû
+	//æŒ‡å®šæ•°æ®åº“åº“å
 	dbProps[1].dwPropertyID = DBPROP_INIT_CATALOG;
 	dbProps[1].dwOptions = DBPROPOPTIONS_REQUIRED;
 	dbProps[1].vValue.vt = VT_BSTR;
 	dbProps[1].vValue.bstrVal = SysAllocString(OLESTR("Study"));
 	dbProps[1].colid = DB_NULLID;
 
-	//Ö¸¶¨Á´½ÓÊý¾Ý¿âµÄÓÃ»§Ãû
+	//æŒ‡å®šé“¾æŽ¥æ•°æ®åº“çš„ç”¨æˆ·å
 	dbProps[2].dwPropertyID = DBPROP_AUTH_USERID;
 	dbProps[2].vValue.vt = VT_BSTR;
 	dbProps[2].vValue.bstrVal = SysAllocString(OLESTR("sa"));
 	
-	//Ö¸¶¨Á´½ÓÊý¾Ý¿âµÄÓÃ»§ÃÜÂë
+	//æŒ‡å®šé“¾æŽ¥æ•°æ®åº“çš„ç”¨æˆ·å¯†ç 
 	dbProps[3].dwPropertyID = DBPROP_AUTH_PASSWORD;
 	dbProps[3].vValue.vt = VT_BSTR;
 	dbProps[3].vValue.bstrVal = SysAllocString(OLESTR("123456"));
 	
 	
-	//ÉèÖÃÊôÐÔ
+	//è®¾ç½®å±žæ€§
 	hRes = pDBInit->QueryInterface(IID_IDBProperties, (void**)&pIDBProperties);
-	GRS_COM_CHECK(hRes, _T("²éÑ¯IDBProperties½Ó¿ÚÊ§°Ü, ´íÎóÂë:%08x\n"), hRes);
+	GRS_COM_CHECK(hRes, _T("æŸ¥è¯¢IDBPropertiesæŽ¥å£å¤±è´¥, é”™è¯¯ç :%08x\n"), hRes);
 	dbPropset->guidPropertySet = DBPROPSET_DBINIT;
 	dbPropset[0].cProperties = 4;
 	dbPropset[0].rgProperties = dbProps;
 	hRes = pIDBProperties->SetProperties(1, dbPropset);
-	GRS_COM_CHECK(hRes, _T("ÉèÖÃÊôÐÔÊ§°Ü, ´íÎóÂë:%08x\n"), hRes);
+	GRS_COM_CHECK(hRes, _T("è®¾ç½®å±žæ€§å¤±è´¥, é”™è¯¯ç :%08x\n"), hRes);
 
-	//Á´½ÓÊý¾Ý¿â
+	//é“¾æŽ¥æ•°æ®åº“
 	hRes = pDBInit->Initialize();
-	GRS_COM_CHECK(hRes, _T("Á´½ÓÊý¾Ý¿âÊ§°Ü£º´íÎóÂë:%08x\n"), hRes);
+	GRS_COM_CHECK(hRes, _T("é“¾æŽ¥æ•°æ®åº“å¤±è´¥ï¼šé”™è¯¯ç :%08x\n"), hRes);
 	//do something
 	pDBInit->Uninitialize();
 
-	GRS_PRINTF(_T("Êý¾Ý¿â²Ù×÷³É¹¦!!!!!\n"));
+	GRS_PRINTF(_T("æ•°æ®åº“æ“ä½œæˆåŠŸ!!!!!\n"));
 CLEAR_UP:
 	GRS_SAFEFREE(pDBInit);
 	GRS_SAFEFREE(pIDBProperties);
