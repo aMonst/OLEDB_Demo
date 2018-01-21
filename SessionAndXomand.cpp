@@ -19,11 +19,11 @@
 	hRes = (I)->QueryInterface(IID_##iid, (void**)&(p##iid));\
 	if(FAILED(hRes))\
 	{\
-		OLEDB_PRINTF(_T("��֧�ֽӿ�:%s\n"), _T(#iid));\
+		OLEDB_PRINTF(_T("不支持接口:%s\n"), _T(#iid));\
 	}\
 	else\
 	{\
-		OLEDB_PRINTF(_T("֧�ֽӿ�:%s\n"), _T(#iid));\
+		OLEDB_PRINTF(_T("支持接口:%s\n"), _T(#iid));\
 	}
 
 #define OLEDB_SUCCESS(hr, ...)\
@@ -48,19 +48,19 @@ BOOL CreateDBSession(IOpenRowset* &pIOpenRowset)
 	BOOL bRet = FALSE;
 	HWND hDesktop = GetDesktopWindow();
 	HRESULT hRes = CoCreateInstance(CLSID_DataLinks, NULL, CLSCTX_INPROC_SERVER, IID_IDBPromptInitialize, (void**)&pIDBPromptInitialize);
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�IDBPromptInitializeʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("创建接口IDBPromptInitialize失败，错误码:%08x\n"), hRes);
 	
 	hRes = pIDBPromptInitialize->PromptDataSource(NULL, hDesktop, DBPROMPTOPTIONS_WIZARDSHEET, 0, NULL, NULL, IID_IDBInitialize, (IUnknown**)&pIDBInitialize);
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�����Դ���öԻ���ʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("弹出接口数据源配置对话框失败，错误码:%08x\n"), hRes);
 	
 	hRes = pIDBInitialize->Initialize();
-	OLEDB_SUCCESS(hRes, _T("�������ݿ�ʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("链接数据库失败，错误码:%08x\n"), hRes);
 
 	hRes = pIDBInitialize->QueryInterface(IID_IDBCreateSession, (void**)&pIDBCreateSession);
 
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�IDBCreateSessionʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("创建接口IDBCreateSession失败，错误码:%08x\n"), hRes);
 	hRes = pIDBCreateSession->CreateSession(NULL, IID_IOpenRowset, (IUnknown**)&pIOpenRowset);
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�IOpenRowsetʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("创建接口IOpenRowset失败，错误码:%08x\n"), hRes);
 	bRet = TRUE;
 
 __CLEAR_UP:
@@ -93,15 +93,15 @@ int _tmain(int argc, TCHAR *argv[])
 	CoInitialize(NULL);
 	if (!CreateDBSession(pIOpenRowset))
 	{
-		OLEDB_PRINTF(_T("���ú���CreateDBSessionʧ�ܣ����򼴽��Ƴ�\n"));
+		OLEDB_PRINTF(_T("调用函数CreateDBSession失败，程序即将推出\n"));
 		return 0;
 	}
 	
 	HRESULT hRes = pIOpenRowset->QueryInterface(IID_IDBCreateCommand, (void**)&pIDBCreateCommand);
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�IDBCreateCommandʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("创建接口IDBCreateCommand失败，错误码:%08x\n"), hRes);
 	
 	hRes = pIDBCreateCommand->CreateCommand(NULL, IID_IAccessor, (IUnknown**)&pIAccessor);
-	OLEDB_SUCCESS(hRes, _T("�����ӿ�IAccessorʧ�ܣ�������:%08x\n"), hRes);
+	OLEDB_SUCCESS(hRes, _T("创建接口IAccessor失败，错误码:%08x\n"), hRes);
 
 	CHECK_OLEDB_INTERFACE(pIAccessor, IColumnsInfo);
 	CHECK_OLEDB_INTERFACE(pIAccessor, ICommand);
